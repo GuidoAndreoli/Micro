@@ -1,0 +1,22 @@
+#define F_CPU 16000000UL
+#include <avr/io.h>
+
+void pwm_init() {
+    // Configurar PB3 (OC0A) como salida
+    DDRB |= (1 << PB3);
+
+    // Modo Fast PWM, no inversor (COM0A1=1, COM0A0=0), WGM02=0, WGM01=1, WGM00=1
+    TCCR0A = (1 << COM0A1) | (1 << WGM01) | (1 << WGM00);
+    TCCR0B = (1 << CS01) | (1 << CS00); // Prescaler 64: f_PWM = 16MHz / (64 * 256) ≈ 976 Hz
+
+    // Valor inicial de ciclo útil (duty cycle)
+    OCR0A = 128; // 50%
+}
+
+int main(void) {
+    pwm_init();
+
+    while (1) {
+        // Aquí podrías variar OCR0A para cambiar el duty cycle dinámicamente
+    }
+}

@@ -1,0 +1,172 @@
+gavrasm Gerd's AVR assembler version 5.4 (C)2022 by DG4FAC
+----------------------------------------------------------
+
+Path:        C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\
+Source file: Priemer parcial. eje2.asm
+Hex file:    Priemer parcial. eje2.hex
+Eeprom file: Priemer parcial. eje2.eep
+Compiled:    02.05.2025, 16:53:42
+Pass:        2
+
+     1: .include "m328pdef.inc"
+ -> Warning 009: Include defs not necessary, using internal values!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 1
+   Source line: .include "m328pdef.inc"
+     2: 
+     3: .org 0x0000
+     4: 000000   C024  RJMP RESET
+     5: .org 0x001A               ; TIMER1_OVF vector
+     6: 00001A   C026  RJMP TIMER1_OVF_ISR
+     7: 
+     8: ; Tabla de valores para display de 7 segmentos (ánodo común)
+     9: SEGMENT_TABLE:
+    10:     .db 0b11000000 ; 0
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 10
+   Source line:     .db 0b11000000 ; 0
+        00001B 00C0
+    11:     .db 0b11111001 ; 1
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 11
+   Source line:     .db 0b11111001 ; 1
+        00001C 00F9
+    12:     .db 0b10100100 ; 2
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 12
+   Source line:     .db 0b10100100 ; 2
+        00001D 00A4
+    13:     .db 0b10110000 ; 3
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 13
+   Source line:     .db 0b10110000 ; 3
+        00001E 00B0
+    14:     .db 0b10011001 ; 4
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 14
+   Source line:     .db 0b10011001 ; 4
+        00001F 0099
+    15:     .db 0b10010010 ; 5
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 15
+   Source line:     .db 0b10010010 ; 5
+        000020 0092
+    16:     .db 0b10000010 ; 6
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 16
+   Source line:     .db 0b10000010 ; 6
+        000021 0082
+    17:     .db 0b11111000 ; 7
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 17
+   Source line:     .db 0b11111000 ; 7
+        000022 00F8
+    18:     .db 0b10000000 ; 8
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 18
+   Source line:     .db 0b10000000 ; 8
+        000023 0080
+    19:     .db 0b10010000 ; 9
+ -> Warning 004: Number of bytes on line is odd, added 00 to fit program memory!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\Priemer parcial. eje2.asm, Line: 19
+   Source line:     .db 0b10010000 ; 9
+        000024 0090
+    20: 
+    21: ; ========================
+    22: RESET:
+    23:     ; Limpiar R1 para usarlo como __zero_reg__
+    24: 000025   2411  CLR R1
+    25: 
+    26:     ; --- Configurar display en PORTD como salida ---
+    27: 000026   EF0F  LDI R16, 0xFF
+    28: 000027   B90A  OUT DDRD, R16
+    29: 
+    30:     ; --- Configurar PB3 (OC2A) como salida para 1kHz ---
+    31: 000028   9A23  SBI DDRB, PB3
+    32: 
+    33:     ; --- Inicializar índice del display ---
+    34: 000029   E010  LDI R17, 0
+    35: 
+    36:     ; --- Timer1: configurar para interrupción por overflow (~1s) ---
+    37: 00002A   E02F  LDI R18, LOW(0xC30F)
+    38: 00002B   9320  STS TCNT1L, R18
+        00002C   0084
+    39: 00002D   EC23  LDI R18, HIGH(0xC30F)
+    40: 00002E   9320  STS TCNT1H, R18
+        00002F   0085
+    41: 
+    42:     ; Habilitar interrupción por overflow
+    43: 000030   E001  LDI R16, (1 << TOIE1)
+    44: 000031   9300  STS TIMSK1, R16
+        000032   006F
+    45: 
+    46:     ; Prescaler = 1024
+    47: 000033   E005  LDI R16, (1 << CS12) | (1 << CS10)
+    48: 000034   9300  STS TCCR1B, R16
+        000035   0081
+    49: 
+    50:     ; --- Timer2: configurar para generar 1 kHz en PB3 ---
+    51:     ; Modo CTC, toggle OC2A
+    52: 000036   E402  LDI R16, (1 << COM2A0) | (1 << WGM21)
+    53: 000037   9300  STS TCCR2A, R16
+        000038   00B0
+    54: 000039   E004  LDI R16, (1 << CS22)               ; prescaler = 64
+    55: 00003A   9300  STS TCCR2B, R16
+        00003B   00B1
+    56: 00003C   E70C  LDI R16, 124
+    57: 00003D   9300  STS OCR2A, R16
+        00003E   00B3
+    58: 
+    59:     ; --- Habilitar interrupciones globales ---
+    60: 00003F   9478  SEI
+    61: 
+    62: LOOP:
+    63: 000040   CFFF  RJMP LOOP
+    64: 
+    65: ; ========================
+    66: TIMER1_OVF_ISR:
+    67:     ; Mostrar número actual
+    68: 000041   E0F0  LDI ZH, HIGH(SEGMENT_TABLE << 1)
+    69: 000042   E3E6  LDI ZL, LOW(SEGMENT_TABLE << 1)
+    70: 000043   0FE1  ADD ZL, R17
+    71: 000044   1DF1  ADC ZH, R1              ; usar R1 como zero_reg
+    72: 000045   9124  LPM R18, Z
+    73: 000046   B92B  OUT PORTD, R18
+    74: 
+    75:     ; Incrementar índice y reiniciar si llega a 10
+    76: 000047   9513  INC R17
+    77: 000048   3114  CPI R17, 20
+    78: 000049   F008  BRLO CONT
+    79: 00004A   E010  LDI R17, 0
+    80: CONT:
+    81:     ; Reiniciar TCNT1 para overflow cada ~1s
+    82: 00004B   E02F  LDI R18, LOW(0xC30F)
+    83: 00004C   9320  STS TCNT1L, R18
+        00004D   0084
+    84: 00004E   EC23  LDI R18, HIGH(0xC30F)
+    85: 00004F   9320  STS TCNT1H, R18
+        000050   0085
+    86: 
+    87: 000051   9518  RETI
+    88: 
+
+List of symbols:
+Type nDef nUsed             Decimalval           Hexval Name
+  T     1     1                    171               AB ATMEGA328P
+  L     1     2                     27               1B SEGMENT_TABLE
+  L     1     2                     37               25 RESET
+  L     1     2                     64               40 LOOP
+  L     1     2                     65               41 TIMER1_OVF_ISR
+  L     1     2                     75               4B CONT
+  C     1     0                     25               19 NOW_Y
+  C     1     0                      5               05 NOW_M
+  C     1     0                      2               02 NOW_D
+  C     1     0                  45779             B2D3 NOW_I
+   No macros.
+
+Program             :       47 words.
+Constants           :       10 words.
+Total program memory:       57 words.
+Eeprom space        :        0 bytes.
+Data segment        :        0 bytes.
+Compilation completed, no errors.
+Compilation ended 02.05.2025, 16:53:42

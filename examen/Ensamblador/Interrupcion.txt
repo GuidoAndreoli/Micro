@@ -1,0 +1,50 @@
+.include "m328pdef.inc"
+
+.org 0x0000
+    rjmp RESET
+.org INT0addr
+    rjmp ISR_INT0
+
+RESET:
+    ; Inicializar Stack Pointer
+    ldi r16, HIGH(RAMEND)
+    out SPH, r16
+    ldi r16, LOW(RAMEND)
+    out SPL, r16
+
+    ; Configurar PB3 (OC0A) como salida PWM
+    ldi r16, (1 << DDB3)
+    out DDRB, r16
+
+    ; Configurar PD2 (INT0) como entrada (ya lo es por defecto)
+
+    ; Configurar Timer0 en modo Fast PWM, salida no inversora
+    ldi r16, (1 << COM0A1) | (1 << WGM01) | (1 << WGM00)
+    out TCCR0A, r16
+    ; Prescaler = 64
+    ldi r16, (1 << CS01) | (1 << CS00)
+    out TCCR0B, r16
+    ; Duty Cycle inicial = 50%
+    ldi r16, 128
+    out OCR0A, r16
+
+    ; Configurar interrupción externa INT0 en flanco de bajada
+    ldi r16, (1 << ISC01)      ; ISC01 = 1, ISC00 = 0
+    out EICRA, r16
+
+    ; Habilitar INT0
+    ldi r16, (1 << INT0)
+    out EIMSK, r16
+
+    ; Habilitar interrupciones globales
+    sei
+
+MAIN_LOOP:
+    rjmp MAIN_LOOP
+
+; Rutina de servicio de interrupción (ISR) de INT0
+ISR_INT0:
+    ; Cambiar duty cycle a 75%
+    ldi r16, 192
+    out OCR0A, r16
+    reti

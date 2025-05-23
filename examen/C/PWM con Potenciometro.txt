@@ -1,0 +1,32 @@
+#define F_CPU 16000000UL
+#include <avr/io.h>
+
+// Inicializar PWM en OC0A (PB3)
+void pwm_init() {
+    DDRB |= (1 << PB3); // OC0A como salida
+    TCCR0A = (1 << COM0A1) | (1 << WGM01) | (1 << WGM00); // Fast PWM, no inversor
+    TCCR0B = (1 << CS01) | (1 << CS00); // Prescaler 64
+}
+
+// Inicializar ADC en el canal 0 (pin PC0)
+void adc_init() {
+    ADMUX = (1 << REFS0); // Referencia AVcc, canal ADC0
+    ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1); // Habilitar ADC, prescaler 64
+}
+
+// Leer valor del ADC (0-1023)
+uint16_t adc_read() {
+    ADCSRA |= (1 << ADSC); // Iniciar conversión
+    while (ADCSRA & (1 << ADSC)); // Esperar a que termine
+    return ADC;
+}
+
+int main(void) {
+    pwm_init();
+    adc_init();
+
+    while (1) {
+        uint16_t adc_val = adc_read();     // Leer ADC
+        OCR0A = adc_val / 4;               // Convertir 10 bits (0-1023) a 8 bits (0-255)
+    }
+}

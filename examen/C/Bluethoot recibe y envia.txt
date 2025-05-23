@@ -1,0 +1,54 @@
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <string.h>
+
+#define BAUD 9600
+#define MYUBRR ((F_CPU / (16UL * BAUD)) - 1)
+
+// Inicializa UART
+void uart_init(unsigned int ubrr) {
+    UBRR0H = (unsigned char)(ubrr >> 8);
+    UBRR0L = (unsigned char)ubrr;
+
+    UCSR0B = (1 << RXEN0) | (1 << TXEN0);                 // Habilitar RX y TX
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);               // 8 bits de datos
+}
+
+// Envía un carácter
+void uart_putchar(char c) {
+    while (!(UCSR0A & (1 << UDRE0)));
+    UDR0 = c;
+}
+
+// Envía una cadena
+void uart_print(const char *s) {
+    while (*s) {
+        uart_putchar(*s++);
+    }
+}
+
+// Recibe un carácter
+char uart_getchar(void) {
+    while (!(UCSR0A & (1 << RXC0))); // Esperar a que llegue algo
+    return UDR0;
+}
+
+int main(void) {
+    uart_init(MYUBRR);
+
+    uart_print("Bluetooth listo!\r\n");
+
+    while (1) {
+        char c = uart_getchar();  // Espera y lee un carácter
+        uart_putchar(c);          // Devuelve el mismo carácter (eco)
+        
+        if (c == '1') {
+            uart_print("Recibido: UNO\r\n");
+        } else if (c == '2') {
+            uart_print("Recibido: DOS\r\n");
+        } else {
+            uart_print("Caracter desconocido\r\n");
+        }
+    }
+}

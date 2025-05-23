@@ -1,0 +1,57 @@
+.include "m328pdef.inc"
+
+.org 0x0000
+    rjmp RESET
+
+; ---- Look-Up Table ----
+.org 0x0100
+LUT:
+    .db 0b00111100  ; Fila 0
+    .db 0b01000010  ; Fila 1
+    .db 0b10100101  ; Fila 2
+    .db 0b10000001  ; Fila 3
+    .db 0b10100101  ; Fila 4
+    .db 0b10011001  ; Fila 5
+    .db 0b01000010  ; Fila 6
+    .db 0b00111100  ; Fila 7
+
+RESET:
+    ; Inicializar stack
+    ldi r16, HIGH(RAMEND)
+    out SPH, r16
+    ldi r16, LOW(RAMEND)
+    out SPL, r16
+
+    ; Configurar PORTB y PORTD como salida
+    ldi r16, 0xFF
+    out DDRB, r16
+    out DDRD, r16
+
+LOOP:
+    ldi r30, LOW(LUT << 1)
+    ldi r31, HIGH(LUT << 1)
+    ldi r18, 0x01       ; Selección de fila (1 solo bit encendido, inicia en bit 0)
+
+DISPLAY_LOOP:
+    ld r16, Z+          ; Obtener dato LUT
+    com r18             ; Invertir selección de fila (si es ánodo común)
+    out PORTD, r18      ; Activar fila
+    out PORTB, r16      ; Activar columnas
+
+    rcall DELAY
+    lsr r18             ; Pasar a la siguiente fila (bit shift)
+    brne DISPLAY_LOOP   ; Si no es 0, repetir
+
+    rjmp LOOP
+
+; ---- Delay muy simple ----
+DELAY:
+    ldi r20, 50
+DEL1:
+    ldi r21, 255
+DEL2:
+    dec r21
+    brne DEL2
+    dec r20
+    brne DEL1
+    ret

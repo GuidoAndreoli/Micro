@@ -1,0 +1,130 @@
+gavrasm Gerd's AVR assembler version 5.4 (C)2022 by DG4FAC
+----------------------------------------------------------
+
+Path:        C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\eje 14\
+Source file: 14.asm
+Hex file:    14.hex
+Eeprom file: 14.eep
+Compiled:    02.05.2025, 18:03:46
+Pass:        2
+
+     1: .include "m328pdef.inc"
+ -> Warning 009: Include defs not necessary, using internal values!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\examen\priemer parcial\eje 14\14.asm, Line: 1
+   Source line: .include "m328pdef.inc"
+     2: 
+     3: .org 0x0000
+     4: 000000   C000  RJMP Start
+     5: 
+     6: .def temp = R16
+     7: 
+     8: Start:
+     9:     ; Configurar Stack Pointer
+    10: 000001   E008  LDI temp, HIGH(RAMEND)
+    11: 000002   BF0E  OUT SPH, temp
+    12: 000003   EF0F  LDI temp, LOW(RAMEND)
+    13: 000004   BF0D  OUT SPL, temp
+    14: 
+    15:     ; Configurar PORTB como salida
+    16: 000005   EF0F  LDI temp, 0xFF
+    17: 000006   B904  OUT DDRB, temp
+    18: 
+    19: Loop:
+    20:     ; Aquí va la rutina RSI_0
+    21: 000007   E041  LDI R20, 0x01
+    22: 000008   B945  OUT PORTB, R20
+    23: 000009   D02B  RCALL Delay
+    24: 
+    25: 00000A   E042  LDI R20, 0x02
+    26: 00000B   B945  OUT PORTB, R20
+    27: 00000C   D028  RCALL Delay
+    28: 
+    29: 00000D   E043  LDI R20, 0x03
+    30: 00000E   B945  OUT PORTB, R20
+    31: 00000F   D025  RCALL Delay
+    32: 
+    33: 000010   E044  LDI R20, 0x04
+    34: 000011   B945  OUT PORTB, R20
+    35: 000012   D022  RCALL Delay
+    36: 
+    37: 000013   E045  LDI R20, 0x05
+    38: 000014   B945  OUT PORTB, R20
+    39: 000015   D01F  RCALL Delay
+    40: 
+    41: 000016   E046  LDI R20, 0x06
+    42: 000017   B945  OUT PORTB, R20
+    43: 000018   D01C  RCALL Delay
+    44: 
+    45: 000019   E047  LDI R20, 0x07
+    46: 00001A   B945  OUT PORTB, R20
+    47: 00001B   D019  RCALL Delay
+    48: 
+    49: 00001C   E048  LDI R20, 0x08
+    50: 00001D   B945  OUT PORTB, R20
+    51: 00001E   D016  RCALL Delay
+    52: 
+    53: 00001F   E048  LDI R20, 0x08
+    54: 000020   B945  OUT PORTB, R20
+    55: 000021   D013  RCALL Delay
+    56: 
+    57: 000022   E047  LDI R20, 0x07
+    58: 000023   B945  OUT PORTB, R20
+    59: 000024   D010  RCALL Delay
+    60: 
+    61: 000025   E045  LDI R20, 0x05
+    62: 000026   B945  OUT PORTB, R20
+    63: 000027   D00D  RCALL Delay
+    64: 
+    65: 000028   E044  LDI R20, 0x04
+    66: 000029   B945  OUT PORTB, R20
+    67: 00002A   D00A  RCALL Delay
+    68: 
+    69: 00002B   E042  LDI R20, 0x02
+    70: 00002C   B945  OUT PORTB, R20
+    71: 00002D   D007  RCALL Delay
+    72: 
+    73: 00002E   E041  LDI R20, 0x01
+    74: 00002F   B945  OUT PORTB, R20
+    75: 000030   D004  RCALL Delay
+    76: 
+    77: 000031   E040  LDI R20, 0x00
+    78: 000032   B945  OUT PORTB, R20
+    79: 000033   D001  RCALL Delay
+    80: 
+    81: 000034   CFD2  RJMP Loop
+    82: 
+    83: ; ---------------------------
+    84: ; Subrutina Delay básica
+    85: Delay:
+    86: 000035   E352  LDI R21, 50
+    87: 000036   EC68  LDI R22, 200
+    88: 000037   0000  NOP
+    89: 000038   956A  DEC R22
+    90: 000039   F7E9  BRNE D2
+    91: 00003A   955A  DEC R21
+    92: 00003B   F7D1  BRNE D1
+    93: 00003C   9508  RET
+    94: 
+
+List of symbols:
+Type nDef nUsed             Decimalval           Hexval Name
+  T     1     1                    171               AB ATMEGA328P
+  L     1     2                      1               01 START
+  L     1     2                      7               07 LOOP
+  L     1    30                     53               35 DELAY
+  L     1     2                     54               36 D1
+  L     1     2                     55               37 D2
+  R     1     6                     16               10 TEMP
+  C     1     0                     25               19 NOW_Y
+  C     1     0                      5               05 NOW_M
+  C     1     0                      2               02 NOW_D
+  C     1     0                  45779             B2D3 NOW_I
+   No macros.
+
+Program             :       61 words.
+Constants           :        0 words.
+Total program memory:       61 words.
+Eeprom space        :        0 bytes.
+Data segment        :        0 bytes.
+Compilation completed, no errors.
+Compilation ended 02.05.2025, 18:03:46

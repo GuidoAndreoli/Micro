@@ -1,0 +1,99 @@
+gavrasm Gerd's AVR assembler version 5.4 (C)2022 by DG4FAC
+----------------------------------------------------------
+
+Path:        C:\Users\Administrador\Desktop\Verano\Micro\POR LA COCA\
+Source file: 11.asm
+Hex file:    11.hex
+Eeprom file: 11.eep
+Compiled:    01.05.2025, 20:33:23
+Pass:        2
+
+     1: .include "m328pdef.inc"
+ -> Warning 009: Include defs not necessary, using internal values!
+   File: C:\Users\Administrador\Desktop\Verano\Micro\POR LA COCA\11.asm, Line: 1
+   Source line: .include "m328pdef.inc"
+     2: 
+     3: .org 0x0000
+     4: 000000   C002  RJMP Inicio
+     5: .org INT0addr
+     6: 000002   C00F  RJMP RSI_0
+     7: 
+     8: Inicio:
+     9: 000003   9478  SEI                  ; Habilitamos interrupciones globales
+    10: 
+    11:     ; Configurar puerto B como salida (LEDs)
+    12: 000004   EF0F  LDI R16, 0xFF
+    13: 000005   B904  OUT DDRB, R16
+    14: 
+    15:     ; Activar pull-up en PD2 (INT0)
+    16: 000006   9A5A  SBI PORTD, 2
+    17: 
+    18:     ; Inicializar pila
+    19: 000007   E018  LDI R17, HIGH(RAMEND)
+    20: 000008   BF1E  OUT SPH, R17
+    21: 000009   EF1F  LDI R17, LOW(RAMEND)
+    22: 00000A   BF1D  OUT SPL, R17
+    23: 
+    24:     ; Habilitar solo INT0
+    25: 00000B   E021  LDI R18, 0x01
+    26: 00000C   BB2D  OUT EIMSK, R18
+    27: 
+    28:     ; Configurar INT0 para flanco de subida (puedes cambiar a 0x02 para bajada)
+    29: 00000D   E031  LDI R19, 0x01
+    30: 00000E   9330  STS EICRA, R19
+        00000F   0069
+    31: 
+    32:     ; Inicializar contador
+    33: 000010   E040  LDI R20, 0x00
+    34: 
+    35: Loop:
+    36: 000011   CFFF  RJMP Loop
+    37: 
+    38: ; Rutina de interrupción INT0: contar hasta 3 pulsos, luego encender LED en PB0
+    39: RSI_0:
+    40: 000012   9543  INC R20            ; Incrementar contador
+    41: 000013   3043  CPI R20, 3
+    42: 000014   F409  BRNE Salir_0
+    43: 000015   9A28  SBI PORTB, 0       ; Encender LED en PB0
+    44: Salir_0:
+    45: 000016   D001  RCALL Mseg
+    46: 000017   9518  RETI
+    47: 
+    48: ; Subrutina de retardo (anti-rebote)
+    49: Mseg:
+    50: 000018   E155  LDI r21, 21
+    51: 000019   E46B  LDI r22, 75
+    52: 00001A   EB7D  LDI r23, 189
+    53: L1:
+    54: 00001B   957A  DEC r23
+    55: 00001C   F7F1  BRNE L1
+    56: 00001D   956A  DEC r22
+    57: 00001E   F7E1  BRNE L1
+    58: 00001F   955A  DEC r21
+    59: 000020   F7D1  BRNE L1
+    60: 000021   0000  NOP
+    61: 000022   9508  RET
+    62: 
+
+List of symbols:
+Type nDef nUsed             Decimalval           Hexval Name
+  T     1     1                    171               AB ATMEGA328P
+  L     1     2                      3               03 INICIO
+  L     1     2                     17               11 LOOP
+  L     1     2                     18               12 RSI_0
+  L     1     2                     22               16 SALIR_0
+  L     1     2                     24               18 MSEG
+  L     1     6                     27               1B L1
+  C     1     0                     25               19 NOW_Y
+  C     1     0                      5               05 NOW_M
+  C     1     0                      1               01 NOW_D
+  C     1     0                  45778             B2D2 NOW_I
+   No macros.
+
+Program             :       34 words.
+Constants           :        0 words.
+Total program memory:       34 words.
+Eeprom space        :        0 bytes.
+Data segment        :        0 bytes.
+Compilation completed, no errors.
+Compilation ended 01.05.2025, 20:33:23

@@ -1,0 +1,27 @@
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+
+// Inicializar ADC
+void adc_init() {
+    ADMUX = (1 << REFS0); // Referencia AVcc (5V), canal ADC0
+    ADCSRA = (1 << ADEN)  // Habilitar ADC
+           | (1 << ADPS2) | (1 << ADPS1); // Prescaler 64
+}
+
+// Leer valor del ADC (0-1023)
+uint16_t adc_read() {
+    ADCSRA |= (1 << ADSC);            // Iniciar conversión
+    while (ADCSRA & (1 << ADSC));     // Esperar a que termine
+    return ADC;                       // Leer resultado
+}
+
+int main(void) {
+    uint16_t valor_adc;
+    adc_init();
+
+    while (1) {
+        valor_adc = adc_read(); // Leer el valor del pin PC0
+        _delay_ms(100);         // Pequeño retardo
+    }
+}

@@ -1,0 +1,2 @@
+Elabore un programa en ensamblador para el microcontrolador ATmega328P que cuente los pulsos de un botón conectado al pin PD2 utilizando la interrupción
+ externa (INT0). Cuando el contador alcance 3 pulsos, el programa debe encender un LED conectado al pin PB0.
